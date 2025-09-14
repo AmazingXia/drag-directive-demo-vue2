@@ -60,8 +60,6 @@ Vue.directive('cube-drag', {
 
       // 如果没有方位修饰符，直接显示可拖拽光标
       if (!direction) {
-        el.style.cursor = 'move';
-        el.setAttribute('dragCursor', 'move');
         return;
       }
 
@@ -91,7 +89,6 @@ Vue.directive('cube-drag', {
       const computedStyle = getComputedStyle(el);
       initialCursor = computedStyle.cursor;
 
-      // 如果初始鼠标不是 'move'，则不执行拖拽
       if (initialCursor !== 'move') {
         return; // 让拉伸指令处理
       }

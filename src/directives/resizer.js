@@ -158,6 +158,8 @@ Vue.directive('cube-resizer', {
       const computedStyle = getComputedStyle(el);
       initialCursor = computedStyle.cursor;
 
+      console.log('initialCursor===>', initialCursor)
+
       const resizeCursors = ['n-resize', 's-resize', 'w-resize', 'e-resize', 'ne-resize', 'nw-resize', 'sw-resize', 'se-resize'];
       if (!resizeCursors.includes(initialCursor)) {
         return; // 不是拉伸光标，不执行拉伸
@@ -205,7 +207,6 @@ Vue.directive('cube-resizer', {
       function handleMouseMove(e) {
         const deltaX = e.pageX - rect.mouseX;
         const deltaY = e.pageY - rect.mouseY;
-
         window.requestAnimationFrame(() => {
           switch (direction) {
             case 'north':
