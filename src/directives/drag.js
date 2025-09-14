@@ -47,8 +47,17 @@ Vue.directive('cube-drag', {
       return isNotResizer;
     }
 
+    // 标记是否正在操作和初始光标状态
+    let isOperating = false;
+    let initialCursor = '';
+
     // 鼠标移动事件处理（用于显示拖拽光标）
     function handleMouseMove(e) {
+      // 如果正在操作，不改变光标样式
+      if (isOperating) {
+        return;
+      }
+
       // 如果没有方位修饰符，直接显示可拖拽光标
       if (!direction) {
         el.style.cursor = 'move';
@@ -78,6 +87,15 @@ Vue.directive('cube-drag', {
 
     // 鼠标按下事件处理
     function handleMouseDown(e) {
+      // 在鼠标按下的瞬间记录初始光标状态
+      const computedStyle = getComputedStyle(el);
+      initialCursor = computedStyle.cursor;
+
+      // 如果初始鼠标不是 'move'，则不执行拖拽
+      if (initialCursor !== 'move') {
+        return; // 让拉伸指令处理
+      }
+
       // 如果指定了选择器，检查是否点击在指定元素上
       if (value && typeof value === 'string') {
         const dragElement = el.querySelector(value);
@@ -124,12 +142,16 @@ Vue.directive('cube-drag', {
       }
 
       function handleMouseUp() {
+        isOperating = false; // 清除操作标志
         document.body.style.userSelect = '';
         document.removeEventListener('mousemove', handleMouseMove, false);
         document.removeEventListener('mouseup', handleMouseUp, false);
       }
 
       if (canDrag) {
+        isOperating = true; // 设置操作标志，锁定光标样式
+        // 锁定当前光标样式，防止在操作过程中改变
+        el.style.cursor = initialCursor;
         document.body.style.userSelect = 'none';
         document.addEventListener('mousemove', handleMouseMove, false);
         document.addEventListener('mouseup', handleMouseUp, false);

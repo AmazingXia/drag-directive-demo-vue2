@@ -123,8 +123,17 @@ Vue.directive('cube-resizer', {
       allowedDirections = Object.keys(resizeCursors);
     }
 
+    // 标记是否正在操作和初始光标状态
+    let isOperating = false;
+    let initialCursor = '';
+
     // 鼠标移动事件处理（用于显示拉伸光标）
     function handleMouseMove(e) {
+      // 如果正在操作，不改变光标样式
+      if (isOperating) {
+        return;
+      }
+
       const rect = Object.assign({
         mouseX: e.pageX,
         mouseY: e.pageY,
@@ -145,6 +154,15 @@ Vue.directive('cube-resizer', {
 
     // 鼠标按下事件处理
     function handleMouseDown(e) {
+      // 在鼠标按下的瞬间记录初始光标状态
+      const computedStyle = getComputedStyle(el);
+      initialCursor = computedStyle.cursor;
+
+      const resizeCursors = ['n-resize', 's-resize', 'w-resize', 'e-resize', 'ne-resize', 'nw-resize', 'sw-resize', 'se-resize'];
+      if (!resizeCursors.includes(initialCursor)) {
+        return; // 不是拉伸光标，不执行拉伸
+      }
+
       // 使用 offsetTop/offsetLeft 获取相对于 offsetParent 的位置
       const height = el.offsetHeight;
       const width = el.offsetWidth;
@@ -223,12 +241,16 @@ Vue.directive('cube-resizer', {
       }
 
       function handleMouseUp() {
+        isOperating = false; // 清除操作标志
         document.removeEventListener('mousemove', handleMouseMove, false);
         document.removeEventListener('mouseup', handleMouseUp, false);
         document.body.style.userSelect = '';
       }
 
       if (direction !== 'initial' && allowedDirections.indexOf(direction) !== -1) {
+        isOperating = true; // 设置操作标志，锁定光标样式
+        // 锁定当前光标样式，防止在操作过程中改变
+        el.style.cursor = `${initialCursor} !important`;
         document.body.style.userSelect = 'none';
         document.addEventListener('mousemove', handleMouseMove, false);
       }
