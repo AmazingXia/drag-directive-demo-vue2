@@ -57,7 +57,7 @@
             stroke="rgba(171, 179, 188, 0.2)"
             :stroke-width="1"
           />
-          <polygon class="polygon-animation" fill="#00EBE2" :fill-opacity="0.07" :points="svgP" />
+          <path class="polygon-animation" fill="#00EBE2" :fill-opacity="0.07" :d="svgP" />
           <path
             class="path-animation"
             :d="svgD1"
@@ -449,9 +449,15 @@ export default {
         this.yBesselArr.push(yD, yD)
 
         this.svgD = `M 0 ${yD} L ${width - 6} ${yD}`
-        this.svgP = `0,${yD} ${width - 6},${yD} ${width - 6},${height} 0,${height} 0,${yD}`
+        // 使用path路径，跟随曲线到底部并闭合
+        this.svgP = `M 0 ${yD} L ${width - 6} ${yD} L ${width - 6} ${height} L 0 ${height} Z`
       } else {
         // 双线一
+        let startX = 0
+        let startY = 0
+        let lastX = 0
+        let lastY = 0
+
         this.yAxisData.forEach((item, index) => {
           let xD = index * xDiff
           const diff = this.chartMaxNum - this.chartMinNum
@@ -463,7 +469,10 @@ export default {
           this.xBesselArr.push(xD)
           this.yBesselArr.push(yD)
           if (index === 0) {
+            startX = xD
+            startY = yD
             this.svgD += 'M' + ' ' + xD + ' ' + yD
+            this.svgP += 'M' + ' ' + xD + ' ' + yD
           } else {
             const prevX = this.xBesselArr[index - 1]
             const prevY = this.yBesselArr[index - 1]
@@ -473,12 +482,14 @@ export default {
             const cp2Y = yD
 
             this.svgD += ` C${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${xD} ${yD}`
+            // 填充区域使用相同的贝塞尔曲线
+            this.svgP += ` C${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${xD} ${yD}`
           }
-          this.svgP += xD + ',' + yD + ' '
+          lastX = xD
+          lastY = yD
         })
-        this.svgP += this.xBesselArr[this.xBesselArr.length - 1] + ',' + height + ' '
-        this.svgP += this.xBesselArr[0] + ',' + height + ' '
-        this.svgP += this.xBesselArr[0] + ',' + this.yBesselArr[0]
+        // 填充区域：从曲线终点到底部，再到起始点底部，最后闭合
+        this.svgP += ` L ${lastX} ${height} L ${startX} ${height} Z`
       }
       // 双线二
       this.xBesselArr2 = []
