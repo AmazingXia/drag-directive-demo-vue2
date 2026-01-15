@@ -1,23 +1,27 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-  </div>
-</template>
+  <div class="home-page">
+    <h1>Vue2 Cube 指令演示</h1>
 
-<script>
-export default {
-  name: 'App'
-}
-</script>
-
-<style>
-#app {
-  font-family: Arial, sans-serif;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-</style>
+    <!-- 导航 -->
+    <div class="nav-section">
+      <button
+        class="nav-button"
+        :class="{ active: currentDemo === 'drag' }"
+        @click="currentDemo = 'drag'"
+      >
+        拖拽指令 (v-cube-drag)
+      </button>
+      <button
+        class="nav-button"
+        :class="{ active: currentDemo === 'resize' }"
+        @click="currentDemo = 'resize'"
+      >
+        拉伸指令 (v-cube-resizer)
+      </button>
+      <router-link to="/chart" class="nav-button chart-link">
+        图表页面
+      </router-link>
+    </div>
 
     <!-- 拖拽指令演示 -->
     <div v-if="currentDemo === 'drag'">
@@ -138,10 +142,10 @@ export default {
 </template>
 
 <script>
-import ResizeDemo from './resize.vue';
+import ResizeDemo from '../resize.vue';
 
 export default {
-  name: 'App',
+  name: 'Home',
   components: {
     ResizeDemo
   },
@@ -219,13 +223,6 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: Arial, sans-serif;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
 .nav-section {
   margin-bottom: 30px;
   text-align: center;
@@ -241,6 +238,8 @@ export default {
   cursor: pointer;
   font-size: 14px;
   transition: all 0.3s;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .nav-button:hover {
@@ -251,6 +250,15 @@ export default {
   background-color: #409EFF;
   color: white;
   border-color: #409EFF;
+}
+
+.chart-link {
+  background-color: #67C23A;
+  color: white;
+}
+
+.chart-link:hover {
+  background-color: #85ce61;
 }
 
 .demo-section {
@@ -352,3 +360,4 @@ export default {
   margin-bottom: 30px;
 }
 </style>
+
